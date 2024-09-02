@@ -1,5 +1,6 @@
 // vue.config.js
 module.exports = {
+  publicPath: './'，
   chainWebpack: config => {
     config.module
       .rule('mjs')
