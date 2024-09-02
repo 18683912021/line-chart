@@ -17,12 +17,12 @@ jobs:
           npm install
           npm run build
 
-      - name: Deploy 🚀
+      - name: Commit build changes
         run: |
-          rm -rf dist  # 删除现有 dist 目录
-          mv -f * ../  # 将构建后的内容移动到主目录
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'actions@github.com'
-          git add .
-          git commit -m "Deploy updates"
-          git push origin main
+          git add -A
+          git commit -m "Deploy updates" || echo "No changes to commit"
+
+      - name: Push changes 🚀
+        run: git push origin main
