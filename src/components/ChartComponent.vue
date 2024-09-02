@@ -72,7 +72,6 @@ const channelList = [
     { label: "11", value: 11 },
     { label: "12", value: 12 },
   ]
-  
 
 const form = reactive({
   //通道
