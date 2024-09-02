@@ -1,22 +1,68 @@
 <template>
   <div class="charts-container">
-    <ChartComponent v-for="i in 12" :key="i" />
+    <ChartComponent
+      v-for="i in 12"
+      :key="i"
+      :result="slightlyReduced[i - 1]"
+      @click="showModal(i)"
+    />
   </div>
+  <el-dialog v-model="dialogVisible" title="Tips" width="1350">
+    <ChartComponent
+      @onSubmit="onSubmit"
+      @startMeasurement="startMeasurement"
+      :result="rawData"
+      :width="1000"
+      :height="600"
+      :isConfig="true"
+    />
+  </el-dialog>
 </template>
 <script setup>
 import { onMounted, ref } from "vue";
 import { query_subcategory } from "@/service/api";
-import ChartComponent from '../components/ChartComponent.vue';
+import ChartComponent from "@/components/ChartComponent.vue";
+import { generateMockData, yAxis } from "@/mockData";
+
+const dialogVisible = ref(false);
+const mockData = generateMockData();
+const slightlyReduced = ref([[{ x: 0, y: 0 }]]);
+// 模拟数据
+const rawData = ref([{ x: 0, y: 0 }]);
+
 onMounted(async () => {
-  const result = query_subcategory({ category: "test" });
-  console.log(result);
+  slightlyReduced.value = mockData.map((item) => {
+    return item.filter((_, index) => index % 10 === 0);
+  });
+  // const result = await query_subcategory({ category: "test" });
 });
+
+const showModal = (i) => {
+  // rawData.value = mockData[i];
+  rawData.value = yAxis
+    .split(" ")
+    .filter((item) => item)
+    .slice(0, 10000)
+    .map((item, index) => {
+      return { x: index, y: item };
+    });
+  dialogVisible.value = true;
+};
+
+const onSubmit = (data) => {
+  console.log(data);
+};
+
+const startMeasurement = () => {
+  console.log("startMeasurement");
+};
+
 </script>
 
 <style scoped>
 .charts-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 </style>

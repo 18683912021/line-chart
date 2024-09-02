@@ -23,9 +23,9 @@ service.interceptors.response.use(
   (response) => {
     const res = response.data;
     // 这里可以根据后端的响应结构来做一些统一处理
-    if (res.code !== 200) {
+    if (res.status !== 200) {
       // 处理错误
-      return Promise.reject(new Error(res.message || 'Error'));
+      return res.message;
     } else {
       return res;
     }
