@@ -13,6 +13,12 @@
         style="max-width: 600px"
         ref="formRef"
       >
+        <el-form-item label="通道IP">
+          <el-input v-model="form.ip" placeholder="请输入IP地址" />
+        </el-form-item>
+        <el-form-item label="通道端口">
+          <el-input v-model="form.port" placeholder="请输入端口" />
+        </el-form-item>
         <el-form-item label="通道选择">
           <el-select v-model="form.channel" placeholder="请选择">
             <el-option
@@ -24,23 +30,47 @@
           </el-select>
         </el-form-item>
         <el-form-item label="中心频率(MHz)">
-          <el-input-number :controls='false' style="width:100%" v-model="form.region" />
+          <el-input-number
+            :controls="false"
+            style="width: 100%"
+            v-model="form.region"
+          />
         </el-form-item>
         <el-form-item label="扫宽(MHz)">
-          <el-input-number :controls='false' style="width:100%" v-model="form.span" />
+          <el-input-number
+            :controls="false"
+            style="width: 100%"
+            v-model="form.span"
+          />
         </el-form-item>
         <el-form-item label="参考电平(dBm)">
-          <el-input-number :controls='false' style="width:100%" v-model="form.referenceLevel" />
+          <el-input-number
+            :controls="false"
+            style="width: 100%"
+            v-model="form.referenceLevel"
+          />
         </el-form-item>
         <el-form-item label="分辨率带宽(MHz)">
-          <el-input-number :controls='false' style="width:100%" v-model="form.resolutionBandwidth" />
+          <el-input-number
+            :controls="false"
+            style="width: 100%"
+            v-model="form.resolutionBandwidth"
+          />
         </el-form-item>
         <el-form-item label="扫描点数">
-          <el-input-number :controls='false' style="width:100%" v-model="form.pointNumber" />
+          <el-input-number
+            :controls="false"
+            style="width: 100%"
+            v-model="form.pointNumber"
+          />
         </el-form-item>
         <el-form-item style="text-align: center" class="button-group">
-          <el-button type="primary" @click="onSubmit" :loading="loading">发送</el-button>
-          <el-button type="primary" @click="startMeasurement" :loading="loading">开始测量</el-button>
+          <el-button type="primary" @click="onSubmit" :loading="loading"
+            >发送</el-button
+          >
+          <el-button type="primary" @click="startMeasurement" :loading="loading"
+            >开始测量</el-button
+          >
         </el-form-item>
       </el-form>
     </div>
@@ -48,10 +78,10 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch, reactive,defineEmits } from "vue";
+import { onMounted, ref, watch, reactive, defineEmits } from "vue";
 import * as echarts from "echarts";
 
-const emit = defineEmits(['onSubmit','startMeasurement']);
+const emit = defineEmits(["onSubmit", "startMeasurement"]);
 
 // 获取图表容器的引用
 const chartRef = ref(null);
@@ -59,22 +89,25 @@ const formRef = ref(null);
 const loading = ref(false);
 let myChart = null;
 const channelList = [
-    { label: "1", value: 1 },
-    { label: "2", value: 2 },
-    { label: "3", value: 3 },
-    { label: "4", value: 4 },
-    { label: "5", value: 5 },
-    { label: "6", value: 6 },
-    { label: "7", value: 7 },
-    { label: "8", value: 8 },
-    { label: "9", value: 9 },
-    { label: "10", value: 10 },
-    { label: "11", value: 11 },
-    { label: "12", value: 12 },
-  ]
-  
+  { label: "1", value: 1 },
+  { label: "2", value: 2 },
+  { label: "3", value: 3 },
+  { label: "4", value: 4 },
+  { label: "5", value: 5 },
+  { label: "6", value: 6 },
+  { label: "7", value: 7 },
+  { label: "8", value: 8 },
+  { label: "9", value: 9 },
+  { label: "10", value: 10 },
+  { label: "11", value: 11 },
+  { label: "12", value: 12 },
+];
 
 const form = reactive({
+  //通道IP
+  ip: "127.0.0.1",
+  //通道端口
+  port: 5000,
   //通道
   channel: 1,
   //中心频率
@@ -106,6 +139,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  pageIndex: {
+    type: Number,
+    default: 1,
+  },
 });
 
 watch(
@@ -126,12 +163,12 @@ watch(
 );
 
 const onSubmit = () => {
-  emit('onSubmit',form)
+  emit("onSubmit", form);
 };
 
 const startMeasurement = () => {
-  emit('startMeasurement')
-}
+  emit("startMeasurement");
+};
 
 // 初始化图表
 const initChart = () => {
@@ -149,7 +186,7 @@ const initChart = () => {
     ],
     // 定义图表标题
     title: {
-      text: "",
+      text: props?.isConfig ? "" : `通道${props.pageIndex}`,
     },
     // 定义提示框组件，触发类型为 'axis'，即鼠标悬停在坐标轴上时触发
     tooltip: {
@@ -216,10 +253,10 @@ onMounted(() => {
   .config-box {
     width: 300px;
     margin-top: 55px;
-    ::v-deep .el-input-number{
-      .el-input__inner{
-      text-align: left;
-    }
+    ::v-deep .el-input-number {
+      .el-input__inner {
+        text-align: left;
+      }
     }
     .button-group {
       ::v-deep .el-form-item__content {

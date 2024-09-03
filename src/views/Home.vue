@@ -5,9 +5,10 @@
       :key="i"
       :result="slightlyReduced[i - 1]"
       @click="showModal(i)"
+      :pageIndex="i"
     />
   </div>
-  <el-dialog v-model="dialogVisible" title="Tips" width="1350">
+  <el-dialog v-model="dialogVisible" :title="dialogTitle" width="1350" destroy-on-close>
     <ChartComponent
       @onSubmit="onSubmit"
       @startMeasurement="startMeasurement"
@@ -15,6 +16,7 @@
       :width="1000"
       :height="600"
       :isConfig="true"
+      :pageIndex="currentPage"
     />
   </el-dialog>
 </template>
@@ -24,7 +26,9 @@ import { query_subcategory } from "@/service/api";
 import ChartComponent from "@/components/ChartComponent.vue";
 import { generateMockData, yAxis } from "@/mockData";
 
-const dialogVisible = ref(false);
+const dialogVisible = ref(false)
+const currentPage = ref(1);
+const dialogTitle = ref(`通道${currentPage}`);
 const mockData = generateMockData();
 const slightlyReduced = ref([[{ x: 0, y: 0 }]]);
 // 模拟数据
@@ -39,6 +43,8 @@ onMounted(async () => {
 
 const showModal = (i) => {
   // rawData.value = mockData[i];
+  currentPage.value = i;
+  dialogTitle.value = `通道${i}`;
   rawData.value = yAxis
     .split(" ")
     .filter((item) => item)
