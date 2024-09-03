@@ -33,14 +33,14 @@
           <el-input-number
             :controls="false"
             style="width: 100%"
-            v-model="form.region"
+            v-model="form.centerFrequency"
           />
         </el-form-item>
         <el-form-item label="扫宽(MHz)">
           <el-input-number
             :controls="false"
             style="width: 100%"
-            v-model="form.span"
+            v-model="form.scanWidth"
           />
         </el-form-item>
         <el-form-item label="参考电平(dBm)">
@@ -54,14 +54,14 @@
           <el-input-number
             :controls="false"
             style="width: 100%"
-            v-model="form.resolutionBandwidth"
+            v-model="form.resolutionBandWidth"
           />
         </el-form-item>
         <el-form-item label="扫描点数">
           <el-input-number
             :controls="false"
             style="width: 100%"
-            v-model="form.pointNumber"
+            v-model="form.scanPoints"
           />
         </el-form-item>
         <el-form-item style="text-align: center" class="button-group">
@@ -111,15 +111,15 @@ const form = reactive({
   //通道
   channel: 1,
   //中心频率
-  region: 1,
+  centerFrequency: 1,
   //扫宽
-  span: 1,
+  scanWidth: 1,
   //参考电平
   referenceLevel: 1,
   //分辨率带宽
-  resolutionBandwidth: 1,
+  resolutionBandWidth: 1,
   //扫描点数
-  pointNumber: 1,
+  scanPoints: 1,
 });
 
 const props = defineProps({
