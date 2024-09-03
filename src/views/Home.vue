@@ -58,7 +58,7 @@ const connectWebSocket = () => {
     const message = event.data;
     console.log(message);
     let data = JSON.parse(message);
-    // if (data.message) console.log(JSON.parse(data.message));
+    if (data.message) console.log(JSON.parse(data.message));
   };
 
   // 监听连接关闭
