@@ -1,7 +1,7 @@
 <template>
   <div class="charts-container">
     <div class="chart-box" v-for="i in 12" :key="i">
-      <el-checkbox-group class="checkbox-group" v-model="maxAndMin[i]">
+      <el-checkbox-group class="checkbox-group" v-model="maxAndMin[i]" @change="submitMaxAndMin">
         <el-checkbox value="max"> 最大值保持 </el-checkbox>
         <el-checkbox value="min"> 最小值保持 </el-checkbox>
       </el-checkbox-group>
@@ -19,7 +19,7 @@
     width="1350"
     destroy-on-close
   >
-    <el-checkbox-group class="checkbox-group" v-model="maxAndMin[currentPage]">
+    <el-checkbox-group class="checkbox-group" v-model="maxAndMin[currentPage]" @change="submitMaxAndMin">
       <el-checkbox value="max"> 最大值保持 </el-checkbox>
       <el-checkbox value="min"> 最小值保持 </el-checkbox>
     </el-checkbox-group>
@@ -95,6 +95,11 @@ const showModal = (i) => {
       return { x: index, y: item };
     });
   dialogVisible.value = true;
+};
+
+// 最大值与最小值保持提交
+const submitMaxAndMin = (e) => {
+  console.log(maxAndMin.value);
 };
 
 const onSubmit = (data) => {
