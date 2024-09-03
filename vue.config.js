@@ -1,6 +1,8 @@
 // vue.config.js
 module.exports = {
-  publicPath: './',
+  publicPath: process.env.NODE_ENV === 'production'
+  ? '/line-chart/'
+  : '/',
   chainWebpack: config => {
     config.module
       .rule('mjs')
