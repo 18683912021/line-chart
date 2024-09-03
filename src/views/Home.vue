@@ -1,20 +1,28 @@
 <template>
   <div class="charts-container">
-    <ChartComponent
-      v-for="i in 12"
-      :key="i"
-      :result="slightlyReduced[i - 1]"
-      @click="showModal(i)"
-      :pageIndex="i"
-    />
+    <div class="chart-box" v-for="i in 12" :key="i">
+      <el-checkbox-group class="checkbox-group" v-model="maxAndMin[i]">
+        <el-checkbox value="max"> 最大值保持 </el-checkbox>
+        <el-checkbox value="min"> 最小值保持 </el-checkbox>
+      </el-checkbox-group>
+      <ChartComponent
+        :result="slightlyReduced[i - 1]"
+        @click="showModal(i)"
+        :pageIndex="i"
+      />
+    </div>
   </div>
-  
+
   <el-dialog
     v-model="dialogVisible"
     :title="dialogTitle"
     width="1350"
     destroy-on-close
   >
+    <el-checkbox-group class="checkbox-group" v-model="maxAndMin[currentPage]">
+      <el-checkbox value="max"> 最大值保持 </el-checkbox>
+      <el-checkbox value="min"> 最小值保持 </el-checkbox>
+    </el-checkbox-group>
     <ChartComponent
       @onSubmit="onSubmit"
       @startMeasurement="startMeasurement"
@@ -37,6 +45,8 @@ const currentPage = ref(1);
 const dialogTitle = ref(`通道${currentPage}`);
 const mockData = generateMockData();
 const slightlyReduced = ref([[{ x: 0, y: 0 }]]);
+//最大值与最小值
+const maxAndMin = ref(Array.from({ length: 12 }, () => ["max", "min"]));
 // 模拟数据
 const rawData = ref([{ x: 0, y: 0 }]);
 
@@ -96,10 +106,18 @@ const startMeasurement = () => {
 };
 </script>
 
-<style scoped>
+<style scoped lang="less">
 .charts-container {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
+  .chart-box {
+    position: relative;
+    .checkbox-group {
+      position: absolute;
+      top: -3px;
+      left: 80px;
+    }
+  }
 }
 </style>
