@@ -229,9 +229,9 @@ const initChart = () => {
           // y 轴映射到 'Income' 维度
           y: "y",
           // 图例名称映射到 'Year' 维度
-          itemName: "y",
+          itemName: "dBm",
           // 提示框中显示的信息，这里显示 'Income'
-          tooltip: ["x"],
+          // tooltip: ["x","y"],
         },
       },
     ],
