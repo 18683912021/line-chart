@@ -191,12 +191,20 @@ const initChart = () => {
     // 定义提示框组件，触发类型为 'axis'，即鼠标悬停在坐标轴上时触发
     tooltip: {
       trigger: "axis",
+      formatter: function (params) {
+        console.log(params[0])
+      let result = `${params[0].data['x']}(MHz)<br/>`;
+      params.forEach(item => {
+        // 假设 y 值是 item.value 的第二个元素
+        result += `${item.data['y']}(dBm)<br/>`;
+      });
+      return result;
+    }
     },
     // 定义 x 轴，类型为 'category'，表示使用类别数据
     xAxis: {
       type: "category",
-      // 设置 x 轴名称为 'Year'，并将其放置在中间位置
-      name: "x",
+      name: "MHz",
       nameLocation: "end",
       axisLabel: {
         interval: 400, // 设置为1，每个数据点都显示。设置为2，显示每隔一个点
@@ -204,9 +212,10 @@ const initChart = () => {
     },
     // 定义 y 轴
     yAxis: {
-      name: "y",
+      name: "dBm",
       min: -150,
       max: 20, // 根据数据范围调整
+      nameLocation: "end",
       interval: 10, // 设置间距为 20
     },
     // 设置线条样式
