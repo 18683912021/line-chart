@@ -1,6 +1,6 @@
 <template>
   <div class="charts-container">
-    <div class="chart-box" v-for="i in loopCount" :key="i">
+    <div class="parent-box" v-for="i in loopCount" :key="i">
       <el-checkbox-group
         class="checkbox-group"
         v-model="maxAndMin[i]"
@@ -73,8 +73,8 @@ const mockData = generateMockData();
 const slightlyReduced = ref([[{ x: 0, y: 0 }]]);
 const loopCount = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 const selectedChannels = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
-const chartWidth = ref(30);
-const chartHeight = ref(20);
+const chartWidth = ref(20);
+const chartHeight = ref(30);
 
 const options = ref([
   { label: "通道1", value: 1 },
@@ -142,6 +142,9 @@ const channelChange = (e) => {
   if (e?.length <= 4) {
     chartHeight.value = e.length == 1 ? 90 : 45;
     chartWidth.value = e.length <= 2 ? 90 : 45;
+  } else {
+    chartHeight.value = 30;
+    chartWidth.value = 20;
   }
 };
 
@@ -176,10 +179,10 @@ const startMeasurement = () => {
 <style scoped lang="less">
 .charts-container {
   display: flex;
-  justify-content: space-between;
   flex-wrap: wrap;
-  .chart-box {
+  .parent-box {
     position: relative;
+    margin: 0 2vw;
     .checkbox-group {
       position: absolute;
       top: -3px;
