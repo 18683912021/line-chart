@@ -199,7 +199,7 @@ const startMeasurement = () => {
   padding-left: 10px;
   position: fixed;
   text-align: left;
-  bottom: 30px;
-  left: 30px;
+  bottom: 20px;
+  right: 20px;
 }
 </style>
