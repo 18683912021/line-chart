@@ -10,9 +10,12 @@
         <el-checkbox value="min"> 最小值保持 </el-checkbox>
       </el-checkbox-group>
       <ChartComponent
+        :key="chartWidth + '-' + chartHeight + '-' + i"
         :result="slightlyReduced[i - 1]"
         @click="showModal(i)"
         :pageIndex="i"
+        :width="chartWidth"
+        :height="chartHeight"
       />
     </div>
   </div>
@@ -70,6 +73,8 @@ const mockData = generateMockData();
 const slightlyReduced = ref([[{ x: 0, y: 0 }]]);
 const loopCount = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 const selectedChannels = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+const chartWidth = ref(30);
+const chartHeight = ref(20);
 
 const options = ref([
   { label: "通道1", value: 1 },
@@ -134,6 +139,10 @@ const sortArray = (arr) => {
 const channelChange = (e) => {
   console.log(sortArray(e));
   loopCount.value = sortArray(e);
+  if (e?.length <= 4) {
+    chartHeight.value = e.length == 1 ? 90 : 45;
+    chartWidth.value = e.length <= 2 ? 90 : 45;
+  }
 };
 
 const showModal = (i) => {

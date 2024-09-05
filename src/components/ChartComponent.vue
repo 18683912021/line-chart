@@ -3,7 +3,10 @@
     <div class="chart-box">
       <div
         ref="chartRef"
-        :style="{ width: `${width}px`, height: `${height}px` }"
+        :style="{
+          width: `${isConfig ? width + 'px' : width + 'vw'}`,
+          height: `${isConfig?  height + 'px': height + 'vh'}`,
+        }"
       ></div>
     </div>
     <div v-if="isConfig" class="config-box">
@@ -129,11 +132,11 @@ const props = defineProps({
   },
   width: {
     type: Number,
-    default: 400,
+    default: 20,
   },
   height: {
     type: Number,
-    default: 300,
+    default: 30,
   },
   isConfig: {
     type: Boolean,
@@ -172,7 +175,6 @@ const startMeasurement = () => {
 
 // 初始化图表
 const initChart = () => {
-  // 初始化 ECharts 实例，并将其绑定到 Vue 组件中的图表容器上
   myChart = echarts.init(chartRef.value);
 
   // 定义图表的配置选项
@@ -192,13 +194,13 @@ const initChart = () => {
     tooltip: {
       trigger: "axis",
       formatter: function (params) {
-      let result = `${params[0].data['x']}(MHz)<br/>`;
-      params.forEach(item => {
-        // 假设 y 值是 item.value 的第二个元素
-        result += `${item.data['y']}(dBm)<br/>`;
-      });
-      return result;
-    }
+        let result = `${params[0].data["x"]}(MHz)<br/>`;
+        params.forEach((item) => {
+          // 假设 y 值是 item.value 的第二个元素
+          result += `${item.data["y"]}(dBm)<br/>`;
+        });
+        return result;
+      },
     },
     // 定义 x 轴，类型为 'category'，表示使用类别数据
     xAxis: {
@@ -206,7 +208,7 @@ const initChart = () => {
       name: "MHz",
       nameLocation: "end",
       axisLabel: {
-        interval: 400, // 设置为1，每个数据点都显示。设置为2，显示每隔一个点
+        interval: props.isConfig? 500 : 100, // 设置为1，每个数据点都显示。设置为2，显示每隔一个点
       },
     },
     // 定义 y 轴
@@ -242,14 +244,20 @@ const initChart = () => {
       },
     ],
     dataZoom: [
-    {
-      type: 'inside', // 内部缩放
-      start: 0,
-      end: 100
-    }
-  ]
+      {
+        type: "inside", // 内部缩放
+        start: 0,
+        end: 100,
+      },
+    ],
   };
-
+  if (props.isConfig) {
+    option.dataZoom.push({
+      type: "slider", // 滑动条缩放
+      start: 0, // 默认起始位置
+      end: 100, // 默认结束位置
+    });
+  }
   // 使用配置选项初始化图表
   myChart.setOption(option);
 };
