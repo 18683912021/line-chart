@@ -41,21 +41,22 @@
       :pageIndex="currentPage"
     />
   </el-dialog>
-  <el-select
-    v-model="defaultValue"
-    placeholder="请选择"
-    size="large"
+
+  <el-checkbox-group
+    v-model="selectedChannels"
+    @change="channelChange"
     class="floatActionDialog"
-    @change="selectChange"
   >
-    <el-option
+    <el-checkbox
       v-for="item in options"
       :key="item.value"
       :label="item.label"
       :value="item.value"
-    />
-  </el-select>
+      >{{ item.label }}</el-checkbox
+    >
+  </el-checkbox-group>
 </template>
+
 <script setup>
 import { onMounted, ref } from "vue";
 import { query_subcategory } from "@/service/api";
@@ -67,24 +68,23 @@ const currentPage = ref(1);
 const dialogTitle = ref(`通道${currentPage}`);
 const mockData = generateMockData();
 const slightlyReduced = ref([[{ x: 0, y: 0 }]]);
-const loopCount = ref(12);
-//下拉框默认值
-const defaultValue = ref("12");
-//1-12
-const options = [
-  { value: "1", label: "1" },
-  { value: "2", label: "2" },
-  { value: "3", label: "3" },
-  { value: "4", label: "4" },
-  { value: "5", label: "5" },
-  { value: "6", label: "6" },
-  { value: "7", label: "7" },
-  { value: "8", label: "8" },
-  { value: "9", label: "9" },
-  { value: "10", label: "10" },
-  { value: "11", label: "11" },
-  { value: "12", label: "12" },
-];
+const loopCount = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+const selectedChannels = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+
+const options = ref([
+  { label: "通道1", value: 1 },
+  { label: "通道2", value: 2 },
+  { label: "通道3", value: 3 },
+  { label: "通道4", value: 4 },
+  { label: "通道5", value: 5 },
+  { label: "通道6", value: 6 },
+  { label: "通道7", value: 7 },
+  { label: "通道8", value: 8 },
+  { label: "通道9", value: 9 },
+  { label: "通道10", value: 10 },
+  { label: "通道11", value: 11 },
+  { label: "通道12", value: 12 },
+]);
 //最大值与最小值
 const maxAndMin = ref(Array.from({ length: 12 }, () => ["max", "min"]));
 // 模拟数据
@@ -101,31 +101,39 @@ onMounted(async () => {
 });
 
 const connectWebSocket = () => {
-  // 创建 WebSocket 连接
-  websocket = new WebSocket("ws://192.168.7.149:5050");
+  try {
+    // 创建 WebSocket 连接
+    websocket = new WebSocket("ws://192.168.7.149:5050");
 
-  // 监听消息
-  websocket.onmessage = (event) => {
-    const message = event.data;
-    console.log(message);
-    let data = JSON.parse(message);
-    if (data.message) console.log(JSON.parse(data.message));
-  };
+    // 监听消息
+    websocket.onmessage = (event) => {
+      const message = event.data;
+      console.log(message);
+      let data = JSON.parse(message);
+      if (data.message) console.log(JSON.parse(data.message));
+    };
 
-  // 监听连接关闭
-  websocket.onclose = () => {
-    console.log("WebSocket closed");
-  };
+    // 监听连接关闭
+    websocket.onclose = () => {
+      console.log("WebSocket closed");
+    };
 
-  // 监听错误
-  websocket.onerror = (error) => {
-    console.error("WebSocket error", error);
-  };
+    // 监听错误
+    websocket.onerror = (error) => {
+      console.error("WebSocket error", error);
+    };
+  } catch (e) {
+    console.log(e);
+  }
 };
 
-const selectChange = (e) => {
-  //下拉框选了几就循环几次
-  loopCount.value = parseInt(e);
+const sortArray = (arr) => {
+  return arr.sort((a, b) => Number(a) - Number(b));
+};
+
+const channelChange = (e) => {
+  console.log(sortArray(e));
+  loopCount.value = sortArray(e);
 };
 
 const showModal = (i) => {
@@ -171,11 +179,15 @@ const startMeasurement = () => {
   }
 }
 .floatActionDialog {
-  width: 100px;
+  width: 80px;
   border-radius: 4px;
+  background: white;
+  z-index: 10;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  padding-left: 10px;
   position: fixed;
+  text-align: left;
   bottom: 30px;
-  right: 30px;
+  left: 30px;
 }
 </style>

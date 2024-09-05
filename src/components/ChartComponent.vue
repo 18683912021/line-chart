@@ -192,7 +192,6 @@ const initChart = () => {
     tooltip: {
       trigger: "axis",
       formatter: function (params) {
-        console.log(params[0])
       let result = `${params[0].data['x']}(MHz)<br/>`;
       params.forEach(item => {
         // 假设 y 值是 item.value 的第二个元素
@@ -233,17 +232,22 @@ const initChart = () => {
         showSymbol: false,
         // 定义数据如何映射到图表的各个维度
         encode: {
-          // x 轴映射到 'Year' 维度
           x: "x",
-          // y 轴映射到 'Income' 维度
           y: "y",
           // 图例名称映射到 'Year' 维度
           itemName: "dBm",
-          // 提示框中显示的信息，这里显示 'Income'
+          // 提示框中显示的信息，这里显示
           // tooltip: ["x","y"],
         },
       },
     ],
+    dataZoom: [
+    {
+      type: 'inside', // 内部缩放
+      start: 0,
+      end: 100
+    }
+  ]
   };
 
   // 使用配置选项初始化图表
