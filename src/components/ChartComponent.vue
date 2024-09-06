@@ -106,25 +106,6 @@ const channelList = [
   { label: "12", value: 12 },
 ];
 
-const form = reactive({
-  //通道IP
-  ip: "127.0.0.1",
-  //通道端口
-  port: 18080,
-  //通道
-  channelName: 1,
-  //中心频率
-  centerFrequency: 1,
-  //扫宽
-  scanWidth: 1,
-  //参考电平
-  referenceLevel: 1,
-  //分辨率带宽
-  resolutionBandWidth: 1,
-  //扫描点数
-  scanPoints: 1,
-});
-
 const props = defineProps({
   result: {
     type: Array,
@@ -146,6 +127,25 @@ const props = defineProps({
     type: Number,
     default: 1,
   },
+});
+
+const form = reactive({
+  //通道IP
+  ip: "127.0.0.1",
+  //通道端口
+  port: 18080,
+  //通道
+  channelName: props.pageIndex,
+  //中心频率
+  centerFrequency: 1,
+  //扫宽
+  scanWidth: 1,
+  //参考电平
+  referenceLevel: 1,
+  //分辨率带宽
+  resolutionBandWidth: 1,
+  //扫描点数
+  scanPoints: 1,
 });
 
 watch(

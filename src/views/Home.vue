@@ -5,6 +5,7 @@
         class="checkbox-group"
         v-model="maxAndMin[i]"
         @change="submitMaxAndMin"
+        :maxAndMin
         style="text-align: left"
       >
         <el-checkbox value="max"> 最大值保持 </el-checkbox>
@@ -12,7 +13,7 @@
       </el-checkbox-group>
       <ChartComponent
         :key="chartWidth + '-' + chartHeight + '-' + i"
-        :result="currentYAxis[i]"
+        :result="currentCoordinate[i]"
         @click="showModal(i)"
         :pageIndex="i"
         :width="chartWidth"
@@ -39,7 +40,7 @@
     <ChartComponent
       @onSubmit="onSubmit"
       @startMeasurement="startMeasurement"
-      :result="currentYAxis[currentPage]"
+      :result="currentCoordinate[currentPage]"
       :width="1000"
       :height="600"
       :isConfig="true"
@@ -70,11 +71,14 @@ import ChartComponent from "@/components/ChartComponent.vue";
 const dialogVisible = ref(false);
 const currentPage = ref(1);
 const dialogTitle = ref(`通道${currentPage}`);
-const currentYAxis = ref(Array.from({ length: 12 }, () => []));
+const currentCoordinate = ref(Array.from({ length: 12 }, () => []));
+const histeryCoordinate = ref(Array.from({ length: 12 }, () => []));
 const loopCount = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 const selectedChannels = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 const chartWidth = ref(20);
 const chartHeight = ref(29);
+//最大值与最小值
+const maxAndMin = ref(Array.from({ length: 12 }, () => ["max", "min"]));
 
 const options = ref([
   { label: "通道1", value: 1 },
@@ -90,8 +94,6 @@ const options = ref([
   { label: "通道11", value: 11 },
   { label: "通道12", value: 12 },
 ]);
-//最大值与最小值
-const maxAndMin = ref(Array.from({ length: 12 }, () => ["max", "min"]));
 
 let websocket = null;
 
@@ -102,14 +104,65 @@ const connectWebSocket = () => {
       console.log("WebSocket connection opened");
     };
     websocket.onmessage = (event) => {
-      currentYAxis.value[currentPage.value] = event.data
+      const data = event.data
         .split(" ")
         .filter((item) => item)
         .slice(0, 10000)
-        .map((item, index) => {
-          return { x: index, y: item };
+        .map(Number);
+      const currentPoints = histeryCoordinate.value[currentPage.value];
+      // 初始化页面的坐标数据
+      if (histeryCoordinate.value[currentPage.value].length === 0) {
+        // 如果当前页面的数据为空，初始化点数据
+        histeryCoordinate.value[currentPage.value] = data.map((item, index) => {
+          return { x: index, y: item, max: item, min: item }; // 初始化最大最小值
         });
-      console.log("Received:", event.data);
+      } else {
+        // 更新每个点的坐标及其历史最大值、最小值
+        for (let index = 0; index < currentPoints.length; index++) {
+          if (index < data.length) {
+            // 如果新数据中有对应的点，更新该点
+            const newY = data[index];
+            currentPoints[index] = {
+              x: currentPoints[index].x,
+              y: 0, // 清空当前值
+              max: Math.max(currentPoints[index].max, newY), // 更新历史最大值
+              min: Math.min(currentPoints[index].min, newY), // 更新历史最小值
+            };
+          } else {
+            // 如果新数据中没有对应的点，保留历史最大值和最小值，清空当前值
+            currentPoints[index] = {
+              ...currentPoints[index],
+              y: 0, // 清空当前值
+            };
+          }
+        }
+
+        // 如果新数据比当前数据长，新增点
+        for (let index = currentPoints.length; index < data.length; index++) {
+          const newY = data[index];
+          currentPoints.push({
+            x: index,
+            y: newY,
+            max: newY, // 初始值
+            min: newY, // 初始值
+          });
+        }
+      }
+      if (
+        histeryCoordinate.value[currentPage.value] &&
+        Array.isArray(histeryCoordinate.value[currentPage.value])
+      ) {
+        currentCoordinate.value[currentPage.value] = histeryCoordinate.value[currentPage.value]?.filter((item) => item.y);
+      }
+      console.log(histeryCoordinate.value[currentPage.value]?.filter((item) => item.y),histeryCoordinate.value[currentPage.value].length);
+      // currentCoordinate.value[currentPage.value] = event.data
+      //   .split(" ")
+      //   .filter((item) => item)
+      //   .slice(0, 10000)
+      //   .map((item, index) => {
+      //     return { x: index, y: item };
+      //   });
+      // console.log("Received:", event.data);
     };
     websocket.onerror = (error) => {
       console.error("WebSocket error:", error);
@@ -138,7 +191,7 @@ const channelChange = (e) => {
 };
 
 const showModal = (i) => {
-  connectWebSocket()
+  connectWebSocket();
   currentPage.value = i;
   dialogTitle.value = `通道${i}`;
   dialogVisible.value = true;
