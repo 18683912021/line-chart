@@ -5,7 +5,7 @@
         ref="chartRef"
         :style="{
           width: `${isConfig ? width + 'px' : width + 'vw'}`,
-          height: `${isConfig?  height + 'px': height + 'vh'}`,
+          height: `${isConfig ? height + 'px' : height + 'vh'}`,
         }"
       ></div>
     </div>
@@ -81,7 +81,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch, reactive, defineEmits } from "vue";
+import { onMounted, ref, watch, reactive, defineEmits, toRaw } from "vue";
 import * as echarts from "echarts";
 
 const emit = defineEmits(["onSubmit", "startMeasurement"]);
@@ -127,6 +127,10 @@ const props = defineProps({
     type: Number,
     default: 1,
   },
+  maxAndMin: {
+    type: Object,
+    default: ["max", "min"],
+  },
 });
 
 const form = reactive({
@@ -149,17 +153,19 @@ const form = reactive({
 });
 
 watch(
-  () => props.result,
-  (newResult) => {
+  () => [props.result, props.maxAndMin],
+  ([newResult, newMaxAndMin]) => {
     if (myChart) {
-      myChart.setOption({
-        dataset: [
-          {
-            id: "dataset_raw",
-            source: newResult,
-          },
-        ],
-      });
+      console.log(newMaxAndMin);
+      initChart(newMaxAndMin);
+      // myChart.setOption({
+      //   dataset: [
+      //     {
+      //       id: "dataset_raw",
+      //       source: newResult,
+      //     },
+      //   ],
+      // });
     }
   },
   { immediate: true }
@@ -174,7 +180,9 @@ const startMeasurement = () => {
 };
 
 // 初始化图表
-const initChart = () => {
+const initChart = (newMaxAndMin) => {
+  let MaxAMin = toRaw(newMaxAndMin);
+  console.log(MaxAMin, MaxAMin["min"]);
   myChart = echarts.init(chartRef.value);
 
   // 定义图表的配置选项
@@ -208,7 +216,7 @@ const initChart = () => {
       name: "MHz",
       nameLocation: "end",
       axisLabel: {
-        interval: props.isConfig? 500 : 150, // 设置为1，每个数据点都显示。设置为2，显示每隔一个点
+        interval: props.isConfig ? 500 : 1000, // 设置为1，每个数据点都显示。设置为2，显示每隔一个点
       },
     },
     // 定义 y 轴
@@ -228,8 +236,6 @@ const initChart = () => {
       {
         // 系列类型为 'line'，表示折线图
         type: "line",
-        // 指定使用的数据集 ID 为 'dataset_raw'
-        datasetId: "dataset_raw",
         // 设置不显示数据点的符号
         showSymbol: false,
         // 定义数据如何映射到图表的各个维度
@@ -240,6 +246,30 @@ const initChart = () => {
           itemName: "dBm",
           // 提示框中显示的信息，这里显示
           // tooltip: ["x","y"],
+        },
+      },
+      {
+        type: "line",
+        showSymbol: false,
+        encode: {
+          x: "x",
+          y: "max", // 第二条线的数据
+          itemName: "dBm",
+        },
+        lineStyle: {
+          opacity: MaxAMin.find((item) => item == "max") ? 1 : 0,
+        },
+      },
+      {
+        type: "line",
+        showSymbol: false,
+        encode: {
+          x: "x",
+          y: "min", // 第三条线的数据
+          itemName: "dBm",
+        },
+        lineStyle: {
+          opacity: MaxAMin.find((item) => item == "min") ? 1 : 0,
         },
       },
     ],
@@ -263,7 +293,7 @@ const initChart = () => {
 };
 // 在组件挂载后初始化图表
 onMounted(() => {
-  initChart();
+  initChart(props.maxAndMin);
 });
 </script>
 
