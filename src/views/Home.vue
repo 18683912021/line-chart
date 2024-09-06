@@ -74,7 +74,7 @@ const slightlyReduced = ref([[{ x: 0, y: 0 }]]);
 const loopCount = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 const selectedChannels = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 const chartWidth = ref(20);
-const chartHeight = ref(30);
+const chartHeight = ref(29);
 
 const options = ref([
   { label: "通道1", value: 1 },
@@ -143,7 +143,7 @@ const channelChange = (e) => {
     chartHeight.value = e.length == 1 ? 90 : 45;
     chartWidth.value = e.length <= 2 ? 90 : 45;
   } else {
-    chartHeight.value = 30;
+    chartHeight.value = 29;
     chartWidth.value = 20;
   }
 };

@@ -208,7 +208,7 @@ const initChart = () => {
       name: "MHz",
       nameLocation: "end",
       axisLabel: {
-        interval: props.isConfig? 500 : 100, // 设置为1，每个数据点都显示。设置为2，显示每隔一个点
+        interval: props.isConfig? 500 : 150, // 设置为1，每个数据点都显示。设置为2，显示每隔一个点
       },
     },
     // 定义 y 轴
