@@ -156,7 +156,6 @@ watch(
   () => [props.result, props.maxAndMin],
   ([newResult, newMaxAndMin]) => {
     if (myChart) {
-      console.log(newMaxAndMin);
       initChart(newMaxAndMin);
       // myChart.setOption({
       //   dataset: [
@@ -182,7 +181,6 @@ const startMeasurement = () => {
 // 初始化图表
 const initChart = (newMaxAndMin) => {
   let MaxAMin = toRaw(newMaxAndMin);
-  console.log(MaxAMin, MaxAMin["min"]);
   myChart = echarts.init(chartRef.value);
 
   // 定义图表的配置选项
