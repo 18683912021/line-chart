@@ -23,7 +23,7 @@
           <el-input v-model="form.port" placeholder="请输入端口" />
         </el-form-item>
         <el-form-item label="通道选择">
-          <el-select v-model="form.channel" placeholder="请选择">
+          <el-select v-model="form.channelName" placeholder="请选择">
             <el-option
               v-for="(item, index) in channelList"
               :label="item.label"
@@ -69,11 +69,11 @@
         </el-form-item>
         <el-form-item style="text-align: center" class="button-group">
           <el-button type="primary" @click="onSubmit" :loading="loading"
-            >发送</el-button
-          >
-          <el-button type="primary" @click="startMeasurement" :loading="loading"
             >开始测量</el-button
           >
+          <!-- <el-button type="primary" @click="startMeasurement" :loading="loading"
+            >开始测量</el-button
+          > -->
         </el-form-item>
       </el-form>
     </div>
@@ -110,9 +110,9 @@ const form = reactive({
   //通道IP
   ip: "127.0.0.1",
   //通道端口
-  port: 5000,
+  port: 18080,
   //通道
-  channel: 1,
+  channelName: 1,
   //中心频率
   centerFrequency: 1,
   //扫宽

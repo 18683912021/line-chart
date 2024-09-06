@@ -5,14 +5,14 @@
         class="checkbox-group"
         v-model="maxAndMin[i]"
         @change="submitMaxAndMin"
-        style="text-align:left;"
+        style="text-align: left"
       >
         <el-checkbox value="max"> 最大值保持 </el-checkbox>
         <el-checkbox value="min"> 最小值保持 </el-checkbox>
       </el-checkbox-group>
       <ChartComponent
         :key="chartWidth + '-' + chartHeight + '-' + i"
-        :result="slightlyReduced[i - 1]"
+        :result="currentYAxis[i]"
         @click="showModal(i)"
         :pageIndex="i"
         :width="chartWidth"
@@ -26,6 +26,7 @@
     :title="dialogTitle"
     width="1350"
     destroy-on-close
+    @close="modalClose"
   >
     <el-checkbox-group
       class="checkbox-group"
@@ -38,7 +39,7 @@
     <ChartComponent
       @onSubmit="onSubmit"
       @startMeasurement="startMeasurement"
-      :result="rawData"
+      :result="currentYAxis[currentPage]"
       :width="1000"
       :height="600"
       :isConfig="true"
@@ -65,13 +66,11 @@
 import { onMounted, ref } from "vue";
 import { query_subcategory } from "@/service/api";
 import ChartComponent from "@/components/ChartComponent.vue";
-import { generateMockData, yAxis } from "@/mockData";
 
 const dialogVisible = ref(false);
 const currentPage = ref(1);
 const dialogTitle = ref(`通道${currentPage}`);
-const mockData = generateMockData();
-const slightlyReduced = ref([[{ x: 0, y: 0 }]]);
+const currentcurrentYAxis = ref(Array.from({ length: 12 }, () => []));
 const loopCount = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 const selectedChannels = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 const chartWidth = ref(20);
@@ -93,43 +92,33 @@ const options = ref([
 ]);
 //最大值与最小值
 const maxAndMin = ref(Array.from({ length: 12 }, () => ["max", "min"]));
-// 模拟数据
-const rawData = ref([{ x: 0, y: 0 }]);
 
 let websocket = null;
 
-onMounted(async () => {
-  slightlyReduced.value = mockData.map((item) => {
-    return item.filter((_, index) => index % 10 === 0);
-  });
-  connectWebSocket();
-  // const result = await query_subcategory({ category: "test" });
-});
-
 const connectWebSocket = () => {
   try {
-    // 创建 WebSocket 连接
-    websocket = new WebSocket("ws://192.168.7.149:5050");
-
-    // 监听消息
+    websocket = new WebSocket("ws://127.0.0.1:8889/websocket");
+    websocket.onopen = () => {
+      console.log("WebSocket connection opened");
+    };
     websocket.onmessage = (event) => {
-      const message = event.data;
-      console.log(message);
-      let data = JSON.parse(message);
-      if (data.message) console.log(JSON.parse(data.message));
+      currentYAxis.value[currentPage.value] = event.data
+        .split(" ")
+        .filter((item) => item)
+        .slice(0, 10000)
+        .map((item, index) => {
+          return { x: index, y: item };
+        });
+      console.log("Received:", event.data);
     };
-
-    // 监听连接关闭
-    websocket.onclose = () => {
-      console.log("WebSocket closed");
-    };
-
-    // 监听错误
     websocket.onerror = (error) => {
-      console.error("WebSocket error", error);
+      console.error("WebSocket error:", error);
     };
-  } catch (e) {
-    console.log(e);
+    websocket.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+  } catch (error) {
+    console.error("Failed to create WebSocket:", error);
   }
 };
 
@@ -138,7 +127,6 @@ const sortArray = (arr) => {
 };
 
 const channelChange = (e) => {
-  console.log(sortArray(e));
   loopCount.value = sortArray(e);
   if (e?.length <= 4) {
     chartHeight.value = e.length == 1 ? 90 : 45;
@@ -150,16 +138,9 @@ const channelChange = (e) => {
 };
 
 const showModal = (i) => {
-  // rawData.value = mockData[i];
+  connectWebSocket()
   currentPage.value = i;
   dialogTitle.value = `通道${i}`;
-  rawData.value = yAxis
-    .split(" ")
-    .filter((item) => item)
-    .slice(0, 10000)
-    .map((item, index) => {
-      return { x: index, y: item };
-    });
   dialogVisible.value = true;
 };
 
@@ -169,7 +150,17 @@ const submitMaxAndMin = (e) => {
 };
 
 const onSubmit = (data) => {
-  console.log(data);
+  if (websocket && websocket.readyState === WebSocket.OPEN) {
+    websocket.send(JSON.stringify(data));
+  }
+};
+
+const modalClose = () => {
+  websocket.close();
+  websocket.onclose = null;
+  websocket.onmessage = null;
+  websocket.onerror = null;
+  websocket.onopen = null;
 };
 
 const startMeasurement = () => {
