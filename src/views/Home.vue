@@ -70,7 +70,7 @@ import ChartComponent from "@/components/ChartComponent.vue";
 const dialogVisible = ref(false);
 const currentPage = ref(1);
 const dialogTitle = ref(`通道${currentPage}`);
-const currentcurrentYAxis = ref(Array.from({ length: 12 }, () => []));
+const currentYAxis = ref(Array.from({ length: 12 }, () => []));
 const loopCount = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 const selectedChannels = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 const chartWidth = ref(20);
