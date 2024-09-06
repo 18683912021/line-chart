@@ -5,6 +5,7 @@
         class="checkbox-group"
         v-model="maxAndMin[i]"
         @change="submitMaxAndMin"
+        style="text-align:left;"
       >
         <el-checkbox value="max"> 最大值保持 </el-checkbox>
         <el-checkbox value="min"> 最小值保持 </el-checkbox>
