@@ -161,7 +161,6 @@ const connectWebSocket = (index) => {
           currentCoordinate.value[currentPage.value].push(...newPoints);
         }
       }
-      console.log(currentCoordinate.value[currentPage.value], data, event);
     };
     websocket.onerror = (error) => {
       console.error("WebSocket error:", error);
