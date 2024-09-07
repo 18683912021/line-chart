@@ -73,6 +73,8 @@ const loopCount = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 const selectedChannels = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 const chartWidth = ref(20);
 const chartHeight = ref(29);
+const websockets = ref(Array.from({ length: 12 }, () => null)); // 存储每个通道的 WebSocket 连接
+const clickedChannels = ref([]);
 
 const options = ref([
   { label: "通道1", value: 1 },
@@ -89,17 +91,21 @@ const options = ref([
   { label: "通道12", value: 12 },
 ]);
 //最大值与最小值
-const maxAndMin = ref(Array.from({ length: 12 }, () => ["max", "min"]));
+const maxAndMin = ref(Array.from({ length: 12 }, () => []));
 
 let websocket = null;
 
-const connectWebSocket = () => {
+const connectWebSocket = (index) => {
   try {
     websocket = new WebSocket("ws://127.0.0.1:8889/websocket");
     websocket.onopen = () => {
       console.log("WebSocket connection opened");
     };
     websocket.onmessage = (event) => {
+      //如果已经点过的里面找不到当前就不执行后面
+      if (!clickedChannels.value.includes(currentPage.value)) {
+        return;
+      }
       const data = event.data
         .split(" ")
         .map(Number)
@@ -155,7 +161,7 @@ const connectWebSocket = () => {
           currentCoordinate.value[currentPage.value].push(...newPoints);
         }
       }
-      console.log(currentCoordinate.value[currentPage.value], data);
+      console.log(currentCoordinate.value[currentPage.value], data, event);
     };
     websocket.onerror = (error) => {
       console.error("WebSocket error:", error);
@@ -163,6 +169,7 @@ const connectWebSocket = () => {
     websocket.onclose = () => {
       console.log("WebSocket connection closed");
     };
+    websockets.value[index] = websocket;
   } catch (error) {
     console.error("Failed to create WebSocket:", error);
   }
@@ -184,24 +191,28 @@ const channelChange = (e) => {
 };
 
 const showModal = (i) => {
-  connectWebSocket();
-  currentPage.value = i - 1;
+  const channelIndex = i - 1;
+  if (!websockets.value[channelIndex]) {
+    connectWebSocket(channelIndex);
+  }
+  currentPage.value = channelIndex;
   dialogTitle.value = `通道${i}`;
   dialogVisible.value = true;
 };
 
 const onSubmit = (data) => {
-  if (websocket && websocket.readyState === WebSocket.OPEN) {
+  if (websockets.value[currentPage.value]) {
     websocket.send(JSON.stringify(data));
+    clickedChannels.value.push(currentPage.value);
   }
 };
 
 const modalClose = () => {
-  websocket.close();
-  websocket.onclose = null;
-  websocket.onmessage = null;
-  websocket.onerror = null;
-  websocket.onopen = null;
+  // websocket.close();
+  // websocket.onclose = null;
+  // websocket.onmessage = null;
+  // websocket.onerror = null;
+  // websocket.onopen = null;
 };
 
 const startMeasurement = () => {
