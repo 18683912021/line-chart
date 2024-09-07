@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, onBeforeUnmount } from "vue";
 import { query_subcategory } from "@/service/api";
 import ChartComponent from "@/components/ChartComponent.vue";
 
@@ -95,28 +95,31 @@ const maxAndMin = ref(Array.from({ length: 12 }, () => []));
 
 let websocket = null;
 
-const connectWebSocket = (index) => {
-  try {
-    websocket = new WebSocket("ws://127.0.0.1:8889/websocket");
-    websocket.onopen = () => {
-      console.log("WebSocket connection opened");
+onMounted(() => {
+  createWebSocket();
+});
+const createWebSocket = () => {
+  //创建12个连接
+  for (let i = 0; i < 12; i++) {
+    const socket = new WebSocket(`ws://127.0.0.1:8889/websocket`);
+
+    socket.onopen = () => {
+      console.log(`WebSocket ${i + 1} 已连接`);
     };
-    websocket.onmessage = (event) => {
-      //如果已经点过的里面找不到当前就不执行后面
-      if (!clickedChannels.value.includes(currentPage.value)) {
-        return;
-      }
+
+    socket.onmessage = (event) => {
+      console.log(`WebSocket ${i + 1} 收到消息: `);
       const data = event.data
         .split(" ")
         .map(Number)
         .filter((item) => !isNaN(item))
         .slice(0, 10000); // 转换为数字并过滤掉非数字
 
-      const currentPageData = currentCoordinate.value[currentPage.value];
+      const currentPageData = currentCoordinate.value[i];
 
       // 如果当前页面的数据为空，初始化点数据
       if (currentPageData.length === 0) {
-        currentCoordinate.value[currentPage.value] = data.map(
+        currentCoordinate.value[i] = data.map(
           (item, index) => ({
             x: index,
             y: item,
@@ -126,7 +129,7 @@ const connectWebSocket = (index) => {
         );
       } else {
         // 更新已有点数据
-        currentCoordinate.value[currentPage.value] = currentPageData.map(
+        currentCoordinate.value[i] = currentPageData.map(
           (point, index) => {
             if (index < data.length) {
               const newY = data[index];
@@ -158,21 +161,47 @@ const connectWebSocket = (index) => {
               max: item,
               min: item,
             }));
-          currentCoordinate.value[currentPage.value].push(...newPoints);
+          currentCoordinate.value[i].push(...newPoints);
         }
       }
     };
-    websocket.onerror = (error) => {
-      console.error("WebSocket error:", error);
+
+    socket.onerror = (error) => {
+      console.log(`WebSocket ${i + 1} 出现错误: `, error);
     };
-    websocket.onclose = () => {
-      console.log("WebSocket connection closed");
+
+    socket.onclose = () => {
+      console.log(`WebSocket ${i + 1} 已关闭`);
     };
-    websockets.value[index] = websocket;
-  } catch (error) {
-    console.error("Failed to create WebSocket:", error);
+    websockets.value[i] = socket;
   }
 };
+
+// const connectWebSocket = (index) => {
+//   try {
+//     websocket = new WebSocket("ws://127.0.0.1:8889/websocket");
+//     websocket.onopen = () => {
+//       console.log("WebSocket connection opened");
+//     };
+//     websocket.onmessage = (event) => {
+//       //如果已经点过的里面找不到当前就不执行后面
+//       if (!clickedChannels.value.includes(currentPage.value)) {
+//         return;
+//       }
+//
+//       console.log(currentCoordinate.value[currentPage.value], data, event);
+//     };
+//     websocket.onerror = (error) => {
+//       console.error("WebSocket error:", error);
+//     };
+//     websocket.onclose = () => {
+//       console.log("WebSocket connection closed");
+//     };
+//     websockets.value[index] = websocket;
+//   } catch (error) {
+//     console.error("Failed to create WebSocket:", error);
+//   }
+// };
 
 const sortArray = (arr) => {
   return arr.sort((a, b) => Number(a) - Number(b));
@@ -192,7 +221,7 @@ const channelChange = (e) => {
 const showModal = (i) => {
   const channelIndex = i - 1;
   if (!websockets.value[channelIndex]) {
-    connectWebSocket(channelIndex);
+    // connectWebSocket(channelIndex);
   }
   currentPage.value = channelIndex;
   dialogTitle.value = `通道${i}`;
@@ -200,8 +229,10 @@ const showModal = (i) => {
 };
 
 const onSubmit = (data) => {
+  console.log(websockets.value);
   if (websockets.value[currentPage.value]) {
-    websocket.send(JSON.stringify(data));
+    console.log(websockets.value[currentPage.value]);
+    websockets.value[currentPage.value].send(JSON.stringify(data));
     clickedChannels.value.push(currentPage.value);
   }
 };
@@ -217,6 +248,16 @@ const modalClose = () => {
 const startMeasurement = () => {
   console.log("startMeasurement");
 };
+
+// 在组件卸载时关闭所有 WebSocket
+onBeforeUnmount(() => {
+  sockets.value.forEach((socket, index) => {
+    console.log(`WebSocket ${index} 关闭中...`);
+    socket.close();
+    socket.onclose = null;
+  });
+  websockets.value = []; // 清空引用
+});
 </script>
 
 <style scoped lang="less">
