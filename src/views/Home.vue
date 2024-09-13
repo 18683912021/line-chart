@@ -101,7 +101,7 @@ onMounted(() => {
 const createWebSocket = () => {
   //创建12个连接
   for (let i = 0; i < 12; i++) {
-    const socket = new WebSocket(`ws://127.0.0.1:8889/websocket`);
+    const socket = new WebSocket(`ws://162.14.111.211:9002/chat`);
 
     socket.onopen = () => {
       console.log(`WebSocket ${i + 1} 已连接`);
@@ -176,32 +176,6 @@ const createWebSocket = () => {
     websockets.value[i] = socket;
   }
 };
-
-// const connectWebSocket = (index) => {
-//   try {
-//     websocket = new WebSocket("ws://127.0.0.1:8889/websocket");
-//     websocket.onopen = () => {
-//       console.log("WebSocket connection opened");
-//     };
-//     websocket.onmessage = (event) => {
-//       //如果已经点过的里面找不到当前就不执行后面
-//       if (!clickedChannels.value.includes(currentPage.value)) {
-//         return;
-//       }
-//
-//       console.log(currentCoordinate.value[currentPage.value], data, event);
-//     };
-//     websocket.onerror = (error) => {
-//       console.error("WebSocket error:", error);
-//     };
-//     websocket.onclose = () => {
-//       console.log("WebSocket connection closed");
-//     };
-//     websockets.value[index] = websocket;
-//   } catch (error) {
-//     console.error("Failed to create WebSocket:", error);
-//   }
-// };
 
 const sortArray = (arr) => {
   return arr.sort((a, b) => Number(a) - Number(b));

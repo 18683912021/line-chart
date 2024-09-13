@@ -139,7 +139,7 @@ const form = reactive({
   //通道端口
   port: 18080,
   //通道
-  channelName: props.pageIndex +1 ,
+  channelName: props.pageIndex + 1,
   //中心频率
   centerFrequency: 1,
   //扫宽
@@ -165,48 +165,48 @@ watch(
             source: newResult,
           },
         ],
-            // 定义系列列表，这里只有一个系列
-    series: [
-      {
-        // 系列类型为 'line'，表示折线图
-        type: "line",
-        // 设置不显示数据点的符号
-        showSymbol: false,
-        // 定义数据如何映射到图表的各个维度
-        encode: {
-          x: "x",
-          y: "y",
-          // 图例名称映射到 'Year' 维度
-          itemName: "dBm",
-          // 提示框中显示的信息，这里显示
-          // tooltip: ["x","y"],
-        },
-      },
-      {
-        type: "line",
-        showSymbol: false,
-        encode: {
-          x: "x",
-          y: "max", // 第二条线的数据
-          itemName: "dBm",
-        },
-        lineStyle: {
-          opacity: MaxAMin.find((item) => item == "max") ? 1 : 0,
-        },
-      },
-      {
-        type: "line",
-        showSymbol: false,
-        encode: {
-          x: "x",
-          y: "min", // 第三条线的数据
-          itemName: "dBm",
-        },
-        lineStyle: {
-          opacity: MaxAMin.find((item) => item == "min") ? 1 : 0,
-        },
-      },
-    ],
+        // 定义系列列表，这里只有一个系列
+        series: [
+          {
+            // 系列类型为 'line'，表示折线图
+            type: "line",
+            // 设置不显示数据点的符号
+            showSymbol: false,
+            // 定义数据如何映射到图表的各个维度
+            encode: {
+              x: "x",
+              y: "y",
+              // 图例名称映射到 'Year' 维度
+              itemName: "dBm",
+              // 提示框中显示的信息，这里显示
+              // tooltip: ["x","y"],
+            },
+          },
+          {
+            type: "line",
+            showSymbol: false,
+            encode: {
+              x: "x",
+              y: "max", // 第二条线的数据
+              itemName: "dBm",
+            },
+            lineStyle: {
+              opacity: MaxAMin.find((item) => item == "max") ? 1 : 0,
+            },
+          },
+          {
+            type: "line",
+            showSymbol: false,
+            encode: {
+              x: "x",
+              y: "min", // 第三条线的数据
+              itemName: "dBm",
+            },
+            lineStyle: {
+              opacity: MaxAMin.find((item) => item == "min") ? 1 : 0,
+            },
+          },
+        ],
       });
     }
   },
