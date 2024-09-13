@@ -277,6 +277,7 @@ const initChart = (newMaxAndMin) => {
       {
         // 系列类型为 'line'，表示折线图
         type: "line",
+        large: true,
         // 设置不显示数据点的符号
         showSymbol: false,
         // 定义数据如何映射到图表的各个维度

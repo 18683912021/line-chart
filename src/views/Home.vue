@@ -101,7 +101,7 @@ onMounted(() => {
 const createWebSocket = () => {
   //创建12个连接
   for (let i = 0; i < 12; i++) {
-    const socket = new WebSocket(`ws://162.14.111.211:9002/chat`);
+    const socket = new WebSocket(`ws://127.0.0.1:8889/websocket`);
 
     socket.onopen = () => {
       console.log(`WebSocket ${i + 1} 已连接`);
