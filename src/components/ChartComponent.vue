@@ -172,6 +172,7 @@ watch(
             type: "line",
             // 设置不显示数据点的符号
             showSymbol: false,
+            large: true,
             // 定义数据如何映射到图表的各个维度
             encode: {
               x: "x",
@@ -224,7 +225,7 @@ const startMeasurement = () => {
 // 初始化图表
 const initChart = (newMaxAndMin) => {
   let MaxAMin = toRaw(newMaxAndMin);
-  myChart = echarts.init(chartRef.value);
+  myChart = echarts.init(chartRef.value,null, { renderer: 'canvas' });
 
   // 定义图表的配置选项
   const option = {
